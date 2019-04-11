@@ -2597,6 +2597,18 @@ graph(%x : Tensor,
         model = Bar()
         self.checkTrace(model, x)
 
+    def test_trace_dict_output(self):
+
+        def trace_dict_output(input):
+            outputs = dict()
+            outputs['a'] = input
+            outputs['b'] = input * 2
+            return outputs
+
+        input = torch.rand(3)
+
+        self.checkTrace(trace_dict_output, input)
+
     def test_trace_variable_instantiation(self):
         def random_foo(x):
             return Variable(Variable(x) + 1.0)

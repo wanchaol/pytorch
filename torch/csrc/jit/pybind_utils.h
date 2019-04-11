@@ -34,6 +34,32 @@ namespace jit {
 // not use AT_ERROR macros, since these macros add stack trace information
 // that is confusing to display to the end user since it always reports
 // locations in libtorch code rather than user code.
+//
+
+struct TypedIValue : public std::pair<IValue, TypePtr> {
+  using pair::pair;
+
+  IValue& ivalue() {
+    return this->first;
+  }
+  TypePtr& type() {
+    return this->second;
+  }
+};
+
+inline TypedIValue toDictKeyIValue(py::handle key) {
+  if (py::isinstance<py::str>(key)) {
+    return TypedIValue(ConstantString::create(py::cast<std::string>(key)),
+                       StringType::create());
+  } else if (PyLong_Check(key.ptr())) {
+    return TypedIValue(py::cast<int64_t>(key), IntType::create());
+  } else if (PyFloat_Check(key.ptr())) {
+    return TypedIValue(py::cast<double>(key), FloatType::create());
+  } else {
+    AT_ERROR("Dictionary inputs may only have string, int, or float keys");
+  }
+}
+
 
 using tracer::TypedStack;
 struct TypedIValue : public std::pair<IValue, TypePtr> {
