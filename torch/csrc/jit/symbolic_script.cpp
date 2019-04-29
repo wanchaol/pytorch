@@ -1044,7 +1044,7 @@ const std::vector<std::string> functions = {
 
             return output, backward
 
-        def layer_norm(input : Tensor,
+        def layer_norm_disable(input : Tensor,
                        normalized_shape : List[int],
                        weight : Optional[Tensor],
                        bias : Optional[Tensor],
